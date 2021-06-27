@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+
+<head>
+    <!-- <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script> -->
+    <!-- <script src="https://unpkg.com/dagre@0.7.4/dist/dagre.js"></script> -->
+    <!-- <script src="https://cytoscape.org/cytoscape.js-dagre/cytoscape-dagre.js"></script> -->
+    <script src="./cytoscape.min.js"></script>
+    <script src="./dagre.js"></script>
+    <script src="./cytoscape-dagre.js"></script>
+    <style>
+        #cy {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cy"></div>
+    <script src="./cases.js"></script>
+    <script>
+        var test_map = new Map();
+        Object.getOwnPropertyNames(cases).forEach(key => {
+            let val_arr = cases[key];
+            test_map.set(key, val_arr);
+        })
+
+        let temp_els = {
+            nodes: Array.from(test_map.keys()).map(key => { return { data: { id: key } } }),
+            edges: Array.from(test_map.keys()).flatMap(key => {
+                return test_map.get(key).map(target => {
+                    return { data: { source: key, target } }
+                })
+            })
+        }
+        console.log(temp_els.edges)
+        var cy = cytoscape({
+            container: document.getElementById('cy'),
+
+            boxSelectionEnabled: false,
+            autounselectify: true,
+            // zoomingEnabled: false,
+            // userZoomingEnabled: false,
+            // userPanningEnabled: false,
+            layout: {
+                name: 'dagre'
+            },
+
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': '#FF7700',
+                        'text-color': '#ffffff',
+                        'text-wrap': 'wrap',
+                        'text-halign': 'center',
+                        'text-valign': 'center',
+                        'content': 'data(id)'
+                    }
+                },
+
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 4,
+                        'target-arrow-shape': 'triangle',
+                        'line-color': '#000',
+                        'target-arrow-color': '#000',
+                        'curve-style': 'bezier'
+                    }
+                }
+            ],
+
+            elements: temp_els
+        });
+    </script>
+</body>
+
+</html>
