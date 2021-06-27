@@ -7,6 +7,7 @@ module.exports = class Cases {
     this.nodes_cases = path.node.body.body[0].cases;
     let jmp_var_path = path.getPrevSibling();
     this.jmp_var_name = String(jmp_var_path.node.declarations[0].id.name);
+    this.jmp_var_final_value = parseInt(path.node.test.right.value);
     this.mapCaseToNextCases();
     console.log(this.map_case_to_next_cases);
     this.writeToFile();
@@ -15,9 +16,11 @@ module.exports = class Cases {
     this.map_case_to_next_cases = new Map();
     this.nodes_cases.forEach(node => {
       let next_nodes = [];
+      console.log(node.test.value);
       if (t.isExpressionStatement(node.consequent[this.getNodeIndexBeforeBreakStatement(node)])) next_nodes = this.getNextNodes(node.consequent[this.getNodeIndexBeforeBreakStatement(node)]);
       this.map_case_to_next_cases.set(node.test.value, next_nodes);
     })
+    if(!this.map_case_to_next_cases.has(this.jmp_var_final_value))this.map_case_to_next_cases.set(this.jmp_var_final_value, []);
   }
   getNodeIndexBeforeBreakStatement(node) {
     if (node.consequent.length === 1 && t.isBreakStatement(node.consequent[0]))
